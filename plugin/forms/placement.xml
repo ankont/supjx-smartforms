@@ -9,6 +9,8 @@
       <option value="toggle">PLG_SYSTEM_SMARTFORMS_MODE_TOGGLE</option>
       <option value="before">PLG_SYSTEM_SMARTFORMS_MODE_BEFORE</option>
       <option value="after">PLG_SYSTEM_SMARTFORMS_MODE_AFTER</option>
+      <option value="left">PLG_SYSTEM_SMARTFORMS_MODE_LEFT</option>
+      <option value="right">PLG_SYSTEM_SMARTFORMS_MODE_RIGHT</option>
     </field>
   </fieldset>
 </form>

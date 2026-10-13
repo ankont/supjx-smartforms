@@ -1,7 +1,7 @@
 /** Fixtures mirror inspected core/SmartBrowser structures, including bare native regions. */
 export const catalogs = {
   article: ['article-text', 'content-settings', 'publishing', 'metadata'],
-  category: ['category-description', 'content-settings', 'publishing', 'metadata'],
+  category: ['category-description', 'content-settings', 'publishing', 'metadata', 'category-options'],
   user: ['user-account', 'user-settings'],
 };
 export function extendedFixture(url) {
@@ -34,7 +34,8 @@ export function extendedFixture(url) {
     main = `<div class="row"><div class="col-lg-9">${editor}</div><div class="col-lg-3">${smart ? panel('content-settings', global) : global}</div></div>`;
     extra = tab(smart ? 'smartbrowser-publishing' : 'publishing', 'Publishing', `<div class="row"><div class="col-lg-6">${panel('publishing', input('publish_up'), smart ? '' : 'id="fieldset-publishingdata"')}</div><div class="col-lg-6">${panel('metadata', input('metadesc'), smart ? '' : 'id="fieldset-metadata"')}</div></div>`);
   }
-  const groups = targets.flatMap((target, index) => ['toggle', 'before', 'toggle', 'after'].map((mode, offset) => ({
+  if(type==='category') extra += tab('attrib-options','Options', panel('category-options', '<div class="form-grid">'+input('params_category_layout')+'</div>', 'id="fieldset-basic"'));
+  const groups = targets.flatMap((target, index) => (url.searchParams.has('sides') ? ['toggle','before','toggle','after','left','right','left','right'] : url.searchParams.has('leftOnly') ? ['left','left'] : url.searchParams.has('rightOnly') ? ['right','right'] : ['toggle', 'before', 'toggle', 'after']).map((mode, offset) => ({
     fieldset: `fields-${100 + index * 10 + offset}`, target, mode,
     fieldIds: [`jform_com_fields_f${100 + index * 10 + offset}`],
   }))).filter(group => !url.searchParams.has('toggleOnly') || group.mode === 'toggle');
@@ -52,9 +53,9 @@ export function extendedFixture(url) {
   return `<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="/joomla/media/vendor/joomla-custom-elements/css/joomla-tab.css"><link rel="stylesheet" href="/plugin/css/placement.css">
   <style>body{font:16px system-ui;margin:24px}fieldset{padding:16px;margin:12px 0}fieldset+fieldset{margin-top:2em}legend{font-weight:bold}.row{display:flex}.col-lg-9{width:75%}.col-lg-3{width:25%}.col-lg-6{width:50%}.visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden}label{margin-right:12px}</style>
   <script>window.Joomla={editors:{instances:{}},getOptions:key=>key==='plg_system_smartforms'?${JSON.stringify(config)}:null,Text:{_:key=>key},sanitizeHtml:value=>value,renderMessages:()=>{}};</script>
-  <script src="/plugin/js/smartforms.js"></script><script src="/joomla/media/vendor/joomla-custom-elements/js/joomla-tab.js" defer></script><script src="/joomla/media/vendor/tinymce/tinymce.min.js" defer></script><script src="/joomla/media/system/js/fields/validate.js" defer></script></head>
+  ${url.searchParams.has('lateSides') ? '' : '<script src="/plugin/js/smartforms.js"></script>'}<script src="/joomla/media/vendor/joomla-custom-elements/js/joomla-tab.js" defer></script><script src="/joomla/media/vendor/tinymce/tinymce.min.js" defer></script><script src="/joomla/media/system/js/fields/validate.js" defer></script></head>
   <body><div ${host}><form id="${formId}" method="post" action="/save" class="form-validate">${body}<button type="submit">Save</button></form></div>
   <script>window.originalControls=[...document.querySelectorAll('input,textarea')];
-  document.addEventListener('DOMContentLoaded',async()=>{if(document.querySelector('.rich-editor')) await tinymce.init({selector:'.rich-editor',base_url:'/joomla/media/vendor/tinymce',suffix:'.min',license_key:'gpl',promotion:false,menubar:false,plugins:[],toolbar:'bold italic',height:200});window.extendedReady=true;});
+  document.addEventListener('DOMContentLoaded',async()=>{if(document.querySelector('.rich-editor')) await tinymce.init({selector:'.rich-editor',base_url:'/joomla/media/vendor/tinymce',suffix:'.min',license_key:'gpl',promotion:false,menubar:false,plugins:[],toolbar:'bold italic',height:200});${url.searchParams.has('lateSides') ? "window.lateEditor=tinymce.get(document.querySelector('.rich-editor').id);window.lateFrame=window.lateEditor.iframeElement;window.lateEditor.setContent('<p>Late unsaved value</p>');Element.prototype.moveBefore=undefined;await import('/plugin/js/smartforms.js');" : ''}window.extendedReady=true;});
   document.querySelector('form').addEventListener('submit',event=>{if(!document.formvalidator.isValid(event.target)){event.preventDefault();return;}tinymce.triggerSave();});</script></body></html>`;
 }

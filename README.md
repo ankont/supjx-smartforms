@@ -1,17 +1,19 @@
 # SuperSoftJx - SmartForms
 
-SmartForms 2.0.2 (`plg_system_smartforms`) places whole Custom Field Groups in Joomla article, article-category and user editing forms. It is an independent, optional Joomla 5/6 system plugin. Native editing works without SmartBrowser; SmartBrowser remains unchanged and does not require this plugin.
+SmartForms 2.1.0 (`plg_system_smartforms`) places whole Custom Field Groups in Joomla article, article-category and user editing forms. It is an independent, optional Joomla 5/6 system plugin. Native editing works without SmartBrowser; SmartBrowser remains unchanged and does not require this plugin.
 
 Version 2.0.1 removes the extra placement margins so moved fieldsets inherit the same template spacing as native regions, and keeps Placement Target before Placement Mode when loading context-specific options.
 
 Version 2.0.2 prevents Cassiopeia's adjacent-fieldset rule from adding a gap before the first visible toggle panel when its preceding panels are hidden. Spacing after real visible fieldsets remains intact.
+
+Version 2.1.0 adds the category Options target, Left/Right placement and verbose aliases for all five modes.
 
 ## Supported forms and targets
 
 | Context | Targets | Supported layouts |
 | --- | --- | --- |
 | `com_content.article` | Article Text (`article-text`), Content Settings (`content-settings`), Publishing (`publishing`), Metadata (`metadata`) | Native administrator and frontend article edit; SmartBrowser administrator and frontend article edit |
-| `com_content.categories` | Category Description (`category-description`), Content Settings, Publishing, Metadata | Native administrator category edit; SmartBrowser category edit |
+| `com_content.categories` | Category Description (`category-description`), Content Settings, Publishing, Metadata, Options (`category-options`) | Native administrator category edit; SmartBrowser category edit |
 | `com_users.user` | Account Details (`user-account`), Basic Settings (`user-settings`) | Native administrator user edit, native frontend profile edit; SmartBrowser user edit |
 
 The native frontend article form combines status/settings with publication fields in its Publishing tab. Use **Publishing** there; it has no separate Content Settings region. Frontend profile Basic Settings appear only when Joomla enables frontend user parameters. Hidden/missing targets, unrelated forms and unrecognized layouts leave their groups in the original position. Joomla has no corresponding native frontend article-category editing form.
@@ -20,14 +22,14 @@ Images/links, associations, permissions, registration and other component/catego
 
 ## Installation and use
 
-1. Install `build/output/plg_system_smartforms-v2.0.2.zip` and enable **System - SuperSoftJx - SmartForms**.
+1. Install `build/output/plg_system_smartforms-v2.1.0.zip` and enable **System - SuperSoftJx - SmartForms**.
 2. Create/edit a Field Group in the article, article-category or user context.
 3. Open **Form Placements** and select a target. The choices are restricted to that group's context.
-4. Select **Replace / Toggle**, **Before** or **After** and save.
+4. Select **Replace / Toggle**, **Before**, **After**, **Left** or **Right** and save.
 
 Multiple targets can coexist in one form. Each has independent ordering, visibility and its own switcher. Toggle initially displays the first configured group, following Joomla's rendered ordering. Click the active fieldset title and its arrow to choose another group or the native region. The title appears once; the menu lives in the legend. Arrow keys and Home/End navigate, Enter/Space select, Escape closes, and Tab resumes normal form navigation. Clicking outside closes the menu.
 
-Before/after groups remain visible with any toggle selection. Fields and editors are neither cloned, disabled nor recreated. Toggle changes visibility only; values in all regions still submit. HTML5 and Joomla validation reveal the affected region and its tab. Only the new menu moves between headings during selection.
+Left/right groups sit beside the native/toggle column, stacked in Joomla ordering. Columns share equal width; both sides together create three equal columns. Below 768px, columns stack in reading order (left, native/toggle, right). Before/after groups surround the complete horizontal row and remain visible with any toggle selection. Fields and editors are neither cloned, disabled nor recreated. Horizontal placement moves the existing native region into its column before editor initialization; late unsafe native regions leave left/right groups in their original position. Toggle changes visibility only; values in all regions still submit. HTML5 and Joomla validation reveal the affected region and its tab. Only the new menu moves between headings during selection.
 
 ## Storage and the 2.0 change
 
@@ -39,7 +41,15 @@ The Note remains the only persisted configuration. Directives use semantic targe
 | `@category-description-` | Before Category Description |
 | `@user-account+` | After Account Details |
 
-Every listed target supports `^`, `-` and `+`. Tokens are case-sensitive and whitespace-delimited. The first supported token wins. Preparing/saving removes only supported tokens for the current context, deduplicates them and preserves the rest of the note, including unknown or wrong-context directives. The visible Note and Field Group list hide recognized directives. Editing controls retain their submitted values after validation failures; saving rejects composed notes exceeding the native 255-character limit.
+| Mode | Short suffix | Verbose suffix |
+| --- | --- | --- |
+| Toggle | `^` | `:toggle` |
+| Before | `-` | `:before` |
+| After | `+` | `:after` |
+| Left | `\` | `:left` |
+| Right | `/` | `:right` |
+
+Every listed target supports all five modes. For example, `@category-options\` and `@category-options:left` are equivalent. The backslash is a single literal Note character. Controls accept either syntax and save the short canonical form. Tokens are case-sensitive and whitespace-delimited. The first supported token wins. Preparing/saving removes only supported tokens for the current context, deduplicates them and preserves the rest of the note, including unknown or wrong-context directives. The visible Note and Field Group list hide recognized directives. Editing controls retain their submitted values after validation failures; saving rejects composed notes exceeding the native 255-character limit.
 
 **As requested, 2.0 does not migrate or interpret the old `@jform_articletext` directives.** They remain ordinary editable note text. Re-select placements through Form Placements and remove old tokens from the Note when upgrading existing groups. The actual native Article Text control ID/name remains unchanged.
 

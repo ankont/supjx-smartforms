@@ -19,6 +19,9 @@ export class NativeFormAdapter extends FormAdapter {
   }
   getTarget(id) {
     const input = name => this.form.querySelector(`[name="jform[${name}]"]`);
+    if (id === 'category-options' && this.config.adapter === 'native-admin') {
+      return this.target(id, this.tabs.querySelector('#attrib-options #fieldset-basic'));
+    }
     if (this.config.adapter === 'native-profile') {
       if (id === 'user-account') return this.target(id, input('username')?.closest('fieldset'));
       if (id === 'user-settings') return this.target(id, this.form.querySelector('[name="jform[params][editor]"]')?.closest('fieldset'));

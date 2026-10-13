@@ -94,5 +94,9 @@ export async function startFixture() {
     } catch { response.writeHead(404); response.end(); }
   });
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
-  return { url: `http://127.0.0.1:${server.address().port}`, requests, close: () => new Promise(resolve => server.close(resolve)) };
+  return { url: `http://127.0.0.1:${server.address().port}`, requests, close: () => new Promise(resolve => {
+    server.close(resolve);
+    // Browsers are closed before fixture teardown; discard remaining HTTP keep-alive sockets.
+    server.closeAllConnections();
+  }) };
 }

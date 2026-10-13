@@ -13,6 +13,7 @@ export class SmartBrowserFormAdapter extends FormAdapter {
   getTarget(id) {
     const main = this.tabs.querySelector('#smartbrowser-main');
     const input = name => this.form.querySelector(`[name="jform[${name}]"]`);
+    if (id === 'category-options') return this.target(id, this.tabs.querySelector('#attrib-options #fieldset-basic'));
     if (id === 'article-text' || id === 'category-description') {
       const native = input(id === 'article-text' ? 'articletext' : 'description')?.closest('fieldset.options-form');
       return main.contains(native) ? this.target(id, native) : null;

@@ -97,6 +97,24 @@
 .smartforms-form fieldset[hidden] + fieldset.smartforms-panel:not([hidden]):nth-child(1 of fieldset:not([hidden])) {
   margin-block-start: 0;
 }
+.smartforms-form .smartforms-side-row {
+  display: grid;
+  grid-template-columns: repeat(var(--smartforms-columns), minmax(0, 1fr));
+  gap: 1rem;
+  align-items: start;
+  min-width: 0;
+}
+.smartforms-form .smartforms-side-column {
+  min-width: 0;
+}
+.smartforms-form .smartforms-side-column > fieldset:first-child {
+  margin-block-start: 0;
+}
+@media (max-width: 767.98px) {
+  .smartforms-form .smartforms-side-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
 .smartforms-form .smartforms-panel[hidden],
 .smartforms-form .smartforms-legend-title[hidden],
 .smartforms-form .smartforms-native-label[hidden],

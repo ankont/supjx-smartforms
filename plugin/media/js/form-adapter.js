@@ -31,7 +31,7 @@ export class FormAdapter {
   getGroups(target) {
     const result = [];
     for (const definition of this.config.groups || []) {
-      if (definition.target !== target.id || !['toggle', 'before', 'after'].includes(definition.mode)
+      if (definition.target !== target.id || !['toggle', 'before', 'after', 'left', 'right'].includes(definition.mode)
         || !/^fields-[1-9][0-9]*$/.test(definition.fieldset)) continue;
       const fields = (definition.fieldIds || []).map(id => this.form.ownerDocument.getElementById(id)).filter(Boolean);
       if (!fields.length || fields.some(field => !this.form.contains(field))) continue;

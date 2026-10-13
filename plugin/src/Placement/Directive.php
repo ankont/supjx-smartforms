@@ -10,16 +10,19 @@ defined('_JEXEC') or die;
 final class Directive
 {
     public const TARGET = 'article-text';
-    public const MODES = ['toggle' => '^', 'before' => '-', 'after' => '+'];
+    public const MODES = ['toggle' => '^', 'before' => '-', 'after' => '+', 'left' => '\\', 'right' => '/'];
 
     /** First supported token wins; all supported duplicates are removed from the human note. */
     public static function parse(string $note, ?string $context = null): array
     {
         $ids = Targets::ids($context);
-        $pattern = '/(?<!\S)@(' . implode('|', array_map(static fn($id) => preg_quote($id, '/'), $ids)) . ')([\^+\-])(?!\S)/u';
+        $suffixes = [...array_values(self::MODES), ...array_map(static fn($mode) => ':' . $mode, array_keys(self::MODES))];
+        $symbols = implode('|', array_map(static fn($symbol) => preg_quote($symbol, '/'), $suffixes));
+        $pattern = '/(?<!\S)@(' . implode('|', array_map(static fn($id) => preg_quote($id, '/'), $ids)) . ')(' . $symbols . ')(?!\S)/u';
         $matches = [[], [], []];
         if ($ids) preg_match_all($pattern, $note, $matches, PREG_OFFSET_CAPTURE);
-        $mode = isset($matches[2][0]) ? array_search($matches[2][0][0], self::MODES, true) : null;
+        $suffix = $matches[2][0][0] ?? null;
+        $mode = $suffix === null ? null : (str_starts_with($suffix, ':') ? substr($suffix, 1) : array_search($suffix, self::MODES, true));
         $plain = $note;
         foreach (array_reverse($matches[0]) as [$token, $offset]) {
             $length = strlen($token);

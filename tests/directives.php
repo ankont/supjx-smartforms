@@ -17,6 +17,11 @@ function check(bool $valid, string $message): void {
 }
 
 foreach (Directive::MODES as $mode => $symbol) {
+    $verbose = 'Human @article-text:' . $mode;
+    $prepared = GroupPlacement::prepare(['context' => 'com_content.article', 'note' => $verbose]);
+    check($prepared['smartforms_mode'] === $mode && $prepared['note'] === 'Human', 'Verbose parsing');
+    check(GroupPlacement::noteForSave($prepared) === 'Human @article-text' . $symbol, 'Canonical short save');
+    check(Directive::compose('A @article-text:' . $mode . ' @article-text' . $symbol, Directive::TARGET, $mode) === 'A @article-text' . $symbol, 'Mixed alias deduplication');
     $saved = 'Σημείωση χρήστη @article-text' . $symbol;
     $data = GroupPlacement::prepare(['context' => 'com_content.article', 'note' => $saved]);
     check($data['note'] === 'Σημείωση χρήστη', 'Human note not preserved');
@@ -32,7 +37,7 @@ foreach (Directive::MODES as $mode => $symbol) {
     $retry['smartforms_target'] = 'joomla';
     check(GroupPlacement::noteForSave($retry) === 'Unsaved edit', 'Default position did not clear only supported directive');
 }
-foreach (['@content^', '@future+', '@article-text?', 'prefix@article-text^', '@article-text^suffix', '(@article-text^)', '@JFORM_ARTICLETEXT^'] as $unknown) {
+foreach (['@content^', '@future+', '@article-text?', 'prefix@article-text^', '@article-text^suffix', '(@article-text^)', '@JFORM_ARTICLETEXT^', '@article-text:unknown', '@article-text:LEFT', '@article-text:leftover', '@article-text//'] as $unknown) {
     check(Directive::parse('Keep ' . $unknown)['note'] === 'Keep ' . $unknown, 'Unsupported token removed');
     check(Directive::parse($unknown)['target'] === 'joomla', 'Unsupported token activated');
 }

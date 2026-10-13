@@ -8,7 +8,7 @@ final class Targets
 {
     public const CONTEXTS = [
         'com_content.article' => ['article-text', 'content-settings', 'publishing', 'metadata'],
-        'com_content.categories' => ['category-description', 'content-settings', 'publishing', 'metadata'],
+        'com_content.categories' => ['category-description', 'content-settings', 'category-options', 'publishing', 'metadata'],
         'com_users.user' => ['user-account', 'user-settings'],
     ];
 
@@ -23,6 +23,7 @@ final class Targets
         return match ($id) {
             'article-text' => 'PLG_SYSTEM_SMARTFORMS_TARGET_ARTICLE_TEXT',
             'category-description' => 'PLG_SYSTEM_SMARTFORMS_TARGET_CATEGORY_DESCRIPTION',
+            'category-options' => 'PLG_SYSTEM_SMARTFORMS_TARGET_CATEGORY_OPTIONS',
             'content-settings' => 'PLG_SYSTEM_SMARTFORMS_TARGET_CONTENT_SETTINGS',
             'publishing' => 'PLG_SYSTEM_SMARTFORMS_TARGET_PUBLISHING',
             'metadata' => 'PLG_SYSTEM_SMARTFORMS_TARGET_METADATA',

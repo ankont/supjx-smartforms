@@ -34,7 +34,7 @@ class FormAdapter {
   getGroups(target) {
     const result = [];
     for (const definition of this.config.groups || []) {
-      if (definition.target !== target.id || !['toggle', 'before', 'after'].includes(definition.mode)
+      if (definition.target !== target.id || !['toggle', 'before', 'after', 'left', 'right'].includes(definition.mode)
         || !/^fields-[1-9][0-9]*$/.test(definition.fieldset)) continue;
       const fields = (definition.fieldIds || []).map(id => this.form.ownerDocument.getElementById(id)).filter(Boolean);
       if (!fields.length || fields.some(field => !this.form.contains(field))) continue;
@@ -90,6 +90,7 @@ class SmartBrowserFormAdapter extends FormAdapter {
   getTarget(id) {
     const main = this.tabs.querySelector('#smartbrowser-main');
     const input = name => this.form.querySelector(`[name="jform[${name}]"]`);
+    if (id === 'category-options') return this.target(id, this.tabs.querySelector('#attrib-options #fieldset-basic'));
     if (id === 'article-text' || id === 'category-description') {
       const native = input(id === 'article-text' ? 'articletext' : 'description')?.closest('fieldset.options-form');
       return main.contains(native) ? this.target(id, native) : null;
@@ -124,6 +125,9 @@ class NativeFormAdapter extends FormAdapter {
   }
   getTarget(id) {
     const input = name => this.form.querySelector(`[name="jform[${name}]"]`);
+    if (id === 'category-options' && this.config.adapter === 'native-admin') {
+      return this.target(id, this.tabs.querySelector('#attrib-options #fieldset-basic'));
+    }
     if (this.config.adapter === 'native-profile') {
       if (id === 'user-account') return this.target(id, input('username')?.closest('fieldset'));
       if (id === 'user-settings') return this.target(id, this.form.querySelector('[name="jform[params][editor]"]')?.closest('fieldset'));
@@ -174,7 +178,12 @@ class PlacementEngine {
       if (!adapter.config.targets.includes(id)) continue;
       const target = adapter.getTarget(id);
       if (!target) continue;
-      const groups = adapter.getGroups(target);
+      let groups = adapter.getGroups(target);
+      // A horizontal layout moves the native region too; reject only those placements if unsafe.
+      if (groups.some(group => ['left', 'right'].includes(group.mode))
+          && !adapter.safeToMove(target.native, target.container)) {
+        groups = groups.filter(group => !['left', 'right'].includes(group.mode));
+      }
       if (!groups.length) continue;
       adapter.form.classList.add('smartforms-form');
       controllers.push(this.applyTarget({
@@ -186,6 +195,7 @@ class PlacementEngine {
     }
     if (!controllers.length) return null;
     adapter.form.dataset.smartformsReady = '1';
+    adapter.form.ownerDocument.defaultView.dispatchEvent(new Event('resize'));
     return { controllers };
   }
 
@@ -197,10 +207,37 @@ class PlacementEngine {
     const before = groups.filter(group => group.mode === 'before');
     const after = groups.filter(group => group.mode === 'after');
     const toggles = groups.filter(group => group.mode === 'toggle');
+    const left = groups.filter(group => group.mode === 'left');
+    const right = groups.filter(group => group.mode === 'right');
     const anchor = document.createComment('smartforms-placement');
     target.native.after(anchor);
     for (const group of before) adapter.move(group.panel, target.container, target.native);
-    for (const group of toggles) adapter.move(group.panel, target.container, anchor);
+    let region = target.container;
+    if (left.length || right.length) {
+      const row = document.createElement('div');
+      row.className = 'smartforms-side-row';
+      row.style.setProperty('--smartforms-columns', String(1 + Number(left.length > 0) + Number(right.length > 0)));
+      const column = side => {
+        const node = document.createElement('div');
+        node.className = `smartforms-side-column smartforms-side-${side}`;
+        row.append(node);
+        return node;
+      };
+      target.native.before(row);
+      if (left.length) {
+        const columnLeft = column('left');
+        for (const group of left) adapter.move(group.panel, columnLeft);
+      }
+      region = column('native');
+      adapter.move(target.native, region);
+      if (right.length) {
+        const columnRight = column('right');
+        for (const group of right) adapter.move(group.panel, columnRight);
+      }
+      row.dataset.smartformsTarget = target.id;
+    }
+    // Toggle panels share the native column; before/after surround the complete horizontal row.
+    for (const group of toggles) adapter.move(group.panel, region, region === target.container ? anchor : null);
     for (const group of after) adapter.move(group.panel, target.container, anchor);
     anchor.remove();
 
