@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+  <fieldset name="smartforms" addruleprefix="SuperSoft\Plugin\System\SmartForms\Rule" label="PLG_SYSTEM_SMARTFORMS_PLACEMENT_LABEL" description="PLG_SYSTEM_SMARTFORMS_PLACEMENT_DESC">
+    <field name="smartforms_present" type="hidden" default="0" filter="integer" />
+    <field name="smartforms_target" type="list" label="PLG_SYSTEM_SMARTFORMS_TARGET_LABEL" default="joomla" filter="string" validate="options" required="true">
+      <option value="joomla">PLG_SYSTEM_SMARTFORMS_TARGET_DEFAULT</option>
+    </field>
+    <field name="smartforms_mode" type="list" label="PLG_SYSTEM_SMARTFORMS_MODE_LABEL" default="toggle" filter="string" validate="options" required="true" showon="smartforms_target!:joomla">
+      <option value="toggle">PLG_SYSTEM_SMARTFORMS_MODE_TOGGLE</option>
+      <option value="before">PLG_SYSTEM_SMARTFORMS_MODE_BEFORE</option>
+      <option value="after">PLG_SYSTEM_SMARTFORMS_MODE_AFTER</option>
+    </field>
+  </fieldset>
+</form>

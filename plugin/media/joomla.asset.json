@@ -1,0 +1,24 @@
+{
+  "$schema": "https://developer.joomla.org/schemas/json-schema/web_assets.json",
+  "name": "plg_system_smartforms",
+  "version": "2.0.2",
+  "description": "SuperSoftJx - SmartForms",
+  "license": "GPL-2.0-or-later",
+  "assets": [
+    {
+      "name": "plg_system_smartforms.placement",
+      "type": "script",
+      "uri": "plg_system_smartforms/smartforms.js",
+      "version": "2.0.2",
+      "dependencies": [
+        "core"
+      ]
+    },
+    {
+      "name": "plg_system_smartforms.placement",
+      "type": "style",
+      "uri": "plg_system_smartforms/placement.css",
+      "version": "2.0.2"
+    }
+  ]
+}

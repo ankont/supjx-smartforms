@@ -1,0 +1,105 @@
+.smartforms-form .smartforms-toggle {
+  position: relative;
+  display: inline-flex;
+  max-width: 100%;
+  vertical-align: baseline;
+}
+.smartforms-form .smartforms-view-button,
+.smartforms-form .smartforms-view-option {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+  font: inherit;
+  line-height: 1.4;
+  text-align: start;
+  color: #123b5d;
+  background: #fff;
+  cursor: pointer;
+  box-shadow: none;
+}
+.smartforms-form .smartforms-view-button {
+  padding: 0 .25rem;
+  border: 0;
+  border-radius: .15rem;
+  max-width: 100%;
+  color: inherit;
+  background: transparent;
+}
+.smartforms-form .smartforms-view-button::after {
+  content: none;
+}
+.smartforms-form .smartforms-view-label {
+  overflow-wrap: anywhere;
+}
+.smartforms-form .smartforms-view-chevron {
+  flex: 0 0 auto;
+}
+.smartforms-form .smartforms-view-button:hover,
+.smartforms-form .smartforms-view-button[aria-expanded="true"] {
+  color: #123b5d;
+  background: #edf4f8;
+  border-color: #7399b3;
+}
+.smartforms-form .smartforms-view-menu {
+  display: block;
+  position: absolute;
+  inset-block-start: calc(100% + .25rem);
+  inset-inline-start: 0;
+  z-index: 1000;
+  min-width: 100%;
+  width: max-content;
+  max-width: min(28rem, calc(100vw - 3rem));
+  max-height: min(20rem, 50vh);
+  overflow-y: auto;
+  padding: .25rem;
+  border: 1px solid #bac6d0;
+  border-radius: .3rem;
+  background: #fff;
+  font-weight: normal;
+  box-shadow: 0 .3rem .9rem #123b5d26;
+}
+.smartforms-form .smartforms-view-menu.smartforms-menu-above {
+  inset-block-start: auto;
+  inset-block-end: calc(100% + .25rem);
+}
+.smartforms-form .smartforms-view-option {
+  width: 100%;
+  padding: .45rem .6rem;
+  border: 0;
+  border-radius: .15rem;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.smartforms-form .smartforms-view-option[aria-checked="true"] {
+  color: #123b5d;
+  background: #e7f2f8;
+}
+.smartforms-form .smartforms-view-option:hover,
+.smartforms-form .smartforms-view-option:focus {
+  color: #123b5d;
+  background: #edf4f8;
+}
+.smartforms-form .smartforms-view-check {
+  flex: 0 0 1em;
+  visibility: hidden;
+}
+.smartforms-form [aria-checked="true"] > .smartforms-view-check {
+  visibility: visible;
+}
+.smartforms-form .smartforms-view-button:focus-visible,
+.smartforms-form .smartforms-view-option:focus-visible {
+  outline: 2px solid #237aa1;
+  outline-offset: 1px;
+}
+/* Hidden siblings still match Cassiopeia's fieldset + fieldset spacing rule.
+   Reset only the first visible region; keep spacing after real visible fieldsets. */
+.smartforms-form fieldset[hidden] + fieldset.smartforms-panel:not([hidden]):nth-child(1 of fieldset:not([hidden])) {
+  margin-block-start: 0;
+}
+.smartforms-form .smartforms-panel[hidden],
+.smartforms-form .smartforms-legend-title[hidden],
+.smartforms-form .smartforms-native-label[hidden],
+.smartforms-form .smartforms-view-menu[hidden] {
+  display: none !important;
+}

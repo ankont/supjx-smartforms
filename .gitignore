@@ -1,0 +1,4 @@
+/build/stage/
+/build/output/
+/node_modules/
+*.log
