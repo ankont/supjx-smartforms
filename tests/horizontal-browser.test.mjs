@@ -10,7 +10,7 @@ test('Horizontal placement, Options, responsive layout and safe native moves', a
   const fixture=await startFixture();
   const browser=await chromium.launch({headless:true,executablePath:process.env.SMARTFORMS_BROWSER_EXECUTABLE||undefined});
   try {
-    for(const [adapter,type] of [['smartbrowser','article'],['smartbrowser','category'],['smartbrowser','user'],['native-admin','article'],['native-admin','category'],['native-admin','user'],['native-article-site','article'],['native-profile','user']]) await t.test(`${adapter} ${type}`,async()=>{
+    for(const [adapter,type] of [['smartbrowser','article'],['smartbrowser','category'],['smartbrowser','user'],['native-admin','article'],['native-admin','category'],['native-admin','user'],['native-admin','tag'],['smartbrowser','tag'],['native-article-site','article'],['native-profile','user']]) await t.test(`${adapter} ${type}`,async()=>{
       const page=await browser.newPage();const errors=[];page.on('pageerror',error=>errors.push(error.message));
       page.setDefaultTimeout(5000);
       await page.goto(`${fixture.url}/?extended=1&sides=1&adapter=${adapter}&type=${type}`);

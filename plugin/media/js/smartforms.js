@@ -80,7 +80,7 @@ class FormAdapter {
 class SmartBrowserFormAdapter extends FormAdapter {
   static find(document, config) {
     if (config?.adapter !== 'smartbrowser') return null;
-    const type = { 'com_content.article': 'article', 'com_content.categories': 'category', 'com_users.user': 'user' }[config.context];
+    const type = { 'com_content.article': 'article', 'com_content.categories': 'category', 'com_users.user': 'user', 'com_tags.tag': 'tag' }[config.context];
     if (!type) return null;
     const form = document.querySelector(`.com-smartbrowser-editor[data-resource-type="${type}"] form#adminForm`);
     const tabs = form?.querySelector('joomla-tab#smartbrowserEditorTabs');
@@ -91,7 +91,9 @@ class SmartBrowserFormAdapter extends FormAdapter {
     const main = this.tabs.querySelector('#smartbrowser-main');
     const input = name => this.form.querySelector(`[name="jform[${name}]"]`);
     if (id === 'category-options') return this.target(id, this.tabs.querySelector('#attrib-options #fieldset-basic'));
-    if (id === 'article-text' || id === 'category-description') {
+    const tagRegions = { 'tag-options': 'options', 'tag-intro-image': 'image-intro', 'tag-full-image': 'image-fulltext' };
+    if (tagRegions[id]) return this.target(id, this.tabs.querySelector(`#attrib-basic #fieldset-${tagRegions[id]}`));
+    if (id === 'article-text' || id === 'category-description' || id === 'tag-description') {
       const native = input(id === 'article-text' ? 'articletext' : 'description')?.closest('fieldset.options-form');
       return main.contains(native) ? this.target(id, native) : null;
     }
@@ -128,6 +130,10 @@ class NativeFormAdapter extends FormAdapter {
     if (id === 'category-options' && this.config.adapter === 'native-admin') {
       return this.target(id, this.tabs.querySelector('#attrib-options #fieldset-basic'));
     }
+    const tagRegions = { 'tag-options': 'options', 'tag-intro-image': 'image-intro', 'tag-full-image': 'image-fulltext' };
+    if (tagRegions[id] && this.config.adapter === 'native-admin') {
+      return this.target(id, this.tabs.querySelector(`#attrib-basic #fieldset-${tagRegions[id]}`));
+    }
     if (this.config.adapter === 'native-profile') {
       if (id === 'user-account') return this.target(id, input('username')?.closest('fieldset'));
       if (id === 'user-settings') return this.target(id, this.form.querySelector('[name="jform[params][editor]"]')?.closest('fieldset'));
@@ -146,10 +152,10 @@ class NativeFormAdapter extends FormAdapter {
       }
       return null;
     }
-    const main = this.tabs.querySelector(this.config.context === 'com_users.user' ? '#details' : '#general');
+    const main = this.tabs.querySelector(['com_users.user', 'com_tags.tag'].includes(this.config.context) ? '#details' : '#general');
     if (!main) return null;
     if (id === 'article-text') return this.target(id, input('articletext')?.closest('fieldset.adminform'));
-    if (id === 'category-description') {
+    if (id === 'category-description' || id === 'tag-description') {
       const region = input('description')?.closest('.col-lg-9');
       return main.contains(region) ? this.wrapContents(region, id) : null;
     }

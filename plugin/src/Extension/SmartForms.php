@@ -164,9 +164,9 @@ final class SmartForms extends CMSPlugin implements SubscriberInterface
         $input = $app->getInput();
         $option = $input->getCmd('option');
         $view = $input->getCmd('view');
-        if ($option === 'com_smartbrowser' && $view === 'editor' && in_array($input->getCmd('type'), ['article', 'category', 'user'], true) && !$input->getBool('done')) return 'smartbrowser';
+        if ($option === 'com_smartbrowser' && $view === 'editor' && in_array($input->getCmd('type'), ['article', 'category', 'user', 'tag'], true) && !$input->getBool('done')) return 'smartbrowser';
         if ($app->isClient('administrator')) {
-            if (($option === 'com_content' && $view === 'article') || ($option === 'com_users' && $view === 'user')
+            if (($option === 'com_content' && $view === 'article') || ($option === 'com_users' && $view === 'user') || ($option === 'com_tags' && $view === 'tag')
                 || ($option === 'com_categories' && $view === 'category' && $input->getCmd('extension', 'com_content') === 'com_content')) return 'native-admin';
         } elseif ($app->isClient('site')) {
             if ($option === 'com_content' && $view === 'form') return 'native-article-site';
@@ -181,9 +181,10 @@ final class SmartForms extends CMSPlugin implements SubscriberInterface
         return match ($input->getCmd('option')) {
             'com_content' => 'com_content.article', 'com_categories' => 'com_content.categories',
             'com_users' => 'com_users.user',
+            'com_tags' => 'com_tags.tag',
             'com_smartbrowser' => match ($input->getCmd('type')) {
                 'article' => 'com_content.article', 'category' => 'com_content.categories',
-                'user' => 'com_users.user', default => null,
+                'user' => 'com_users.user', 'tag' => 'com_tags.tag', default => null,
             },
             default => null,
         };

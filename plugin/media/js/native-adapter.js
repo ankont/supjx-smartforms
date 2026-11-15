@@ -22,6 +22,10 @@ export class NativeFormAdapter extends FormAdapter {
     if (id === 'category-options' && this.config.adapter === 'native-admin') {
       return this.target(id, this.tabs.querySelector('#attrib-options #fieldset-basic'));
     }
+    const tagRegions = { 'tag-options': 'options', 'tag-intro-image': 'image-intro', 'tag-full-image': 'image-fulltext' };
+    if (tagRegions[id] && this.config.adapter === 'native-admin') {
+      return this.target(id, this.tabs.querySelector(`#attrib-basic #fieldset-${tagRegions[id]}`));
+    }
     if (this.config.adapter === 'native-profile') {
       if (id === 'user-account') return this.target(id, input('username')?.closest('fieldset'));
       if (id === 'user-settings') return this.target(id, this.form.querySelector('[name="jform[params][editor]"]')?.closest('fieldset'));
@@ -40,10 +44,10 @@ export class NativeFormAdapter extends FormAdapter {
       }
       return null;
     }
-    const main = this.tabs.querySelector(this.config.context === 'com_users.user' ? '#details' : '#general');
+    const main = this.tabs.querySelector(['com_users.user', 'com_tags.tag'].includes(this.config.context) ? '#details' : '#general');
     if (!main) return null;
     if (id === 'article-text') return this.target(id, input('articletext')?.closest('fieldset.adminform'));
-    if (id === 'category-description') {
+    if (id === 'category-description' || id === 'tag-description') {
       const region = input('description')?.closest('.col-lg-9');
       return main.contains(region) ? this.wrapContents(region, id) : null;
     }

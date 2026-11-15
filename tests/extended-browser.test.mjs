@@ -11,7 +11,7 @@ test('All form adapters, contexts and simultaneous targets', async t => {
   const browser = await chromium.launch({ headless: true, executablePath: process.env.SMARTFORMS_BROWSER_EXECUTABLE || undefined });
   try {
     const scenarios = [['smartbrowser','article'],['smartbrowser','category'],['smartbrowser','user'],
-      ['native-admin','article'],['native-admin','category'],['native-admin','user'],
+      ['native-admin','article'],['native-admin','category'],['native-admin','user'],['native-admin','tag'],['smartbrowser','tag'],
       ['native-article-site','article'],['native-profile','user']];
     await t.test('Hidden preceding fieldsets do not add frontend top spacing', async () => {
       for (const adapter of ['smartbrowser','native-article-site','native-profile']) {

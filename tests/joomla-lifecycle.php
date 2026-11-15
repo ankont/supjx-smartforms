@@ -66,7 +66,7 @@ check($form->process($data) === false, 'Composed oversized note passed native va
 $data['note'] = 'Safe';
 $data['smartforms_target'] = 'unknown';
 check($form->process($data) === false, 'Unsupported target passed native options validation');
-$other = ['context' => 'com_tags.tag', 'note' => 'Keep @article-text^'];
+$other = ['context' => 'com_menus.item', 'note' => 'Keep @article-text^'];
 check(prepare($other) === $other, 'Unrelated context was modified');
 $app->testClient = 'site';
 check(prepare(['context' => 'com_content.article', 'note' => '@article-text^'])['note'] === '@article-text^', 'Site group settings were modified');
@@ -123,7 +123,7 @@ $app->getDispatcher()->dispatch('onAfterDispatch', new AfterDispatchEvent('onAft
 check(!str_contains($document->getBuffer('component'), '@article-text'), 'Native list dispatch did not hide directive');
 check(str_contains($document->getBuffer('component'), 'Normal note'), 'Native list dispatch lost normal note');
 check($storedNote === 'Normal note @article-text-', 'List presentation changed stored note');
-foreach (['com_tags.tag', 'com_contact.contact'] as $context) {
+foreach (['com_menus.item', 'com_contact.contact'] as $context) {
     $input->set('context', $context);
     $document->setBuffer($list, ['type' => 'component']);
     $plugin->prepareGroupList();

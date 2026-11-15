@@ -12,6 +12,22 @@ use SuperSoft\Plugin\System\SmartForms\Placement\GroupPlacement;
 use SuperSoft\Plugin\System\SmartForms\Adapter\FormAdapter;
 $count=0;
 function check(bool $valid,string $message): void {global $count;if(!$valid)throw new RuntimeException($message);++$count;}
+$smartTagRoot=dirname(__DIR__,2).'/pkg_smarttag/package/plugins/system/tagcustomfields/src';
+if(!is_file($smartTagRoot.'/TagFields.php'))throw new RuntimeException('SmartTag integration source is required.');
+require_once $smartTagRoot.'/TagFields.php';
+check(\SuperSoft\Plugin\System\TagCustomFields\TagFields::CONTEXT==='com_tags.tag','SmartTag context contract changed');
+$tagForm=nativeForm('com_tags.tag',['control'=>'jform']);
+$tagForm->loadFile(JPATH_ADMINISTRATOR.'/components/com_tags/forms/tag.xml');
+check(FormAdapter::supports($tagForm),'Actual core tag form unsupported');
+check(isset($tagForm->getFieldsets()['options'],$tagForm->getFieldsets()['image-intro'],$tagForm->getFieldsets()['image-fulltext']),'Tag region definitions changed');
+check(FormAdapter::configuration($tagForm,[])['groups']===[],'A tag without rendered custom fields must remain inactive');
+$tagForm->load('<form><fields name="com_fields"><fieldset name="fields-9"><field name="tagvalue" type="text"/></fieldset></fields></form>');
+$tagConfig=FormAdapter::configuration($tagForm,[
+  (object)['id'=>9,'context'=>'com_tags.tag','note'=>'@tag-description:left'],
+  (object)['id'=>9,'context'=>'com_content.article','note'=>'@metadata^'],
+]);
+check(count($tagConfig['groups'])===1 && $tagConfig['groups'][0]['target']==='tag-description'
+  && $tagConfig['groups'][0]['mode']==='left','Tag/article group ID isolation or verbose mapping failed');
 $plugin=new SmartForms($app->getDispatcher(),['name'=>'smartforms','type'=>'system']);$plugin->setApplication($app);
 $app->getLanguage()->load('joomla', JPATH_ADMINISTRATOR);
 foreach(Targets::CONTEXTS as $context=>$targets) {
@@ -42,21 +58,21 @@ foreach(Targets::CONTEXTS as $context=>$targets) {
   check($old['note']==='Keep @jform_articletext^' && $old['smartforms_target']==='joomla','Legacy directive should be ordinary note');
   foreach(array_diff(Targets::ids(),$targets) as $foreign)check(Directive::parse('@'.$foreign.'^',$context)['target']==='joomla','Foreign directive activated');
 }
-foreach(['com_content.article'=>'articletext','com_content.form'=>'articletext','com_categories.categorycom_content'=>'description','com_users.user'=>'username','com_users.profile'=>'username'] as $name=>$field) {
+foreach(['com_content.article'=>'articletext','com_content.form'=>'articletext','com_categories.categorycom_content'=>'description','com_users.user'=>'username','com_users.profile'=>'username','com_tags.tag'=>'description'] as $name=>$field) {
   $form=nativeForm($name,['control'=>'jform']);
   $form->load('<form><field name="'.$field.'" type="text"/><fields name="com_fields"><fieldset name="fields-8"><field name="eight" type="text"/></fieldset><fieldset name="fields-2"><field name="two" type="text"/></fieldset></fields></form>');
   $context=Targets::formContext($name);$target=Targets::ids($context)[0];
-  $config=FormAdapter::configuration($form,[(object)['id'=>2,'context'=>$context,'note'=>'@'.$target.'^'],(object)['id'=>8,'context'=>$context,'note'=>'@'.$target.'-'],(object)['id'=>88,'context'=>'com_tags.tag','note'=>'@'.$target.'^']],'native-admin');
+  $config=FormAdapter::configuration($form,[(object)['id'=>2,'context'=>$context,'note'=>'@'.$target.'^'],(object)['id'=>8,'context'=>$context,'note'=>'@'.$target.'-'],(object)['id'=>88,'context'=>'com_menus.item','note'=>'@'.$target.'^']],'native-admin');
   check(FormAdapter::supports($form),'Supported native form rejected');
   check($config['context']===$context && array_column($config['groups'],'fieldset')===['fields-8','fields-2'],'Wrong form mapping/order');
 }
 $reflection=new ReflectionProperty(SmartForms::class,'editorForm');
-foreach([['administrator','com_content','article','','com_content.article','articletext'],['administrator','com_categories','category','','com_categories.categorycom_content','description'],['administrator','com_users','user','','com_users.user','username'],['site','com_content','form','','com_content.form','articletext'],['site','com_users','profile','edit','com_users.profile','username'],['site','com_smartbrowser','editor','','com_users.user','username']] as [$client,$option,$view,$layout,$name,$field]) {
-  $app->testClient=$client;$input=$app->getInput();$input->set('option',$option);$input->set('view',$view);$input->set('layout',$layout);$input->set('type','user');$input->set('extension','com_content');
+foreach([['administrator','com_content','article','','com_content.article','articletext'],['administrator','com_categories','category','','com_categories.categorycom_content','description'],['administrator','com_users','user','','com_users.user','username'],['administrator','com_tags','tag','','com_tags.tag','description'],['site','com_content','form','','com_content.form','articletext'],['site','com_users','profile','edit','com_users.profile','username'],['site','com_smartbrowser','editor','','com_users.user','username'],['site','com_smartbrowser','editor','','com_tags.tag','description']] as [$client,$option,$view,$layout,$name,$field]) {
+  $app->testClient=$client;$input=$app->getInput();$input->set('option',$option);$input->set('view',$view);$input->set('layout',$layout);$input->set('type',$name==='com_tags.tag'?'tag':'user');$input->set('extension','com_content');
   $form=nativeForm($name);$form->load('<form><field name="'.$field.'" type="text"/></form>');
   $reflection->setValue($plugin,null);$plugin->prepareForm(new PrepareFormEvent('onContentPrepareForm',['subject'=>$form,'data'=>[]]));
   check($reflection->getValue($plugin)===$form,'Route rejected editing form');
-  $wrong=nativeForm('com_tags.tag');$wrong->load('<form><field name="description" type="text"/></form>');
+  $wrong=nativeForm('com_menus.item');$wrong->load('<form><field name="description" type="text"/></form>');
   $reflection->setValue($plugin,null);$plugin->prepareForm(new PrepareFormEvent('onContentPrepareForm',['subject'=>$wrong,'data'=>[]]));
   check($reflection->getValue($plugin)===null,'Unrelated form captured');
 }

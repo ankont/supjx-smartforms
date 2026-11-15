@@ -16,7 +16,7 @@ final class FormAdapter
     public static function supports(Form $form): bool
     {
         $field = match (Targets::formContext($form->getName())) {
-            'com_content.article' => 'articletext', 'com_content.categories' => 'description',
+            'com_content.article' => 'articletext', 'com_content.categories', 'com_tags.tag' => 'description',
             'com_users.user' => 'username', default => null,
         };
         return $field !== null && $form->getField($field) !== false;

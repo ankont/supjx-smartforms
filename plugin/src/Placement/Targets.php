@@ -10,6 +10,7 @@ final class Targets
         'com_content.article' => ['article-text', 'content-settings', 'publishing', 'metadata'],
         'com_content.categories' => ['category-description', 'content-settings', 'category-options', 'publishing', 'metadata'],
         'com_users.user' => ['user-account', 'user-settings'],
+        'com_tags.tag' => ['tag-description', 'content-settings', 'tag-options', 'tag-intro-image', 'tag-full-image', 'publishing', 'metadata'],
     ];
 
     public static function ids(?string $context = null): array
@@ -24,6 +25,10 @@ final class Targets
             'article-text' => 'PLG_SYSTEM_SMARTFORMS_TARGET_ARTICLE_TEXT',
             'category-description' => 'PLG_SYSTEM_SMARTFORMS_TARGET_CATEGORY_DESCRIPTION',
             'category-options' => 'PLG_SYSTEM_SMARTFORMS_TARGET_CATEGORY_OPTIONS',
+            'tag-description' => 'PLG_SYSTEM_SMARTFORMS_TARGET_TAG_DESCRIPTION',
+            'tag-options' => 'PLG_SYSTEM_SMARTFORMS_TARGET_TAG_OPTIONS',
+            'tag-intro-image' => 'PLG_SYSTEM_SMARTFORMS_TARGET_TAG_INTRO_IMAGE',
+            'tag-full-image' => 'PLG_SYSTEM_SMARTFORMS_TARGET_TAG_FULL_IMAGE',
             'content-settings' => 'PLG_SYSTEM_SMARTFORMS_TARGET_CONTENT_SETTINGS',
             'publishing' => 'PLG_SYSTEM_SMARTFORMS_TARGET_PUBLISHING',
             'metadata' => 'PLG_SYSTEM_SMARTFORMS_TARGET_METADATA',
@@ -39,6 +44,7 @@ final class Targets
             'com_content.article', 'com_content.form' => 'com_content.article',
             'com_categories.categorycom_content' => 'com_content.categories',
             'com_users.user', 'com_users.profile' => 'com_users.user',
+            'com_tags.tag' => 'com_tags.tag',
             default => null,
         };
     }

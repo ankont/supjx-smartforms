@@ -1,6 +1,6 @@
 # SuperSoftJx - SmartForms
 
-SmartForms 2.1.0 (`plg_system_smartforms`) places whole Custom Field Groups in Joomla article, article-category and user editing forms. It is an independent, optional Joomla 5/6 system plugin. Native editing works without SmartBrowser; SmartBrowser remains unchanged and does not require this plugin.
+SmartForms 2.2.0 (`plg_system_smartforms`) places whole Custom Field Groups in Joomla article, article-category, user and tag editing forms. It is an independent, optional Joomla 5/6 system plugin. Native editing works without SmartBrowser; SmartBrowser remains unchanged and does not require this plugin.
 
 Version 2.0.1 removes the extra placement margins so moved fieldsets inherit the same template spacing as native regions, and keeps Placement Target before Placement Mode when loading context-specific options.
 
@@ -8,22 +8,27 @@ Version 2.0.2 prevents Cassiopeia's adjacent-fieldset rule from adding a gap bef
 
 Version 2.1.0 adds the category Options target, Left/Right placement and verbose aliases for all five modes.
 
+Version 2.2.0 adds SmartTag Custom Fields integration through the native `com_tags.tag` context, Field Group placement settings/list presentation and native/SmartBrowser tag editor targets. No SmartTag or SmartBrowser files are changed.
+
 ## Supported forms and targets
 
 | Context | Targets | Supported layouts |
 | --- | --- | --- |
 | `com_content.article` | Article Text (`article-text`), Content Settings (`content-settings`), Publishing (`publishing`), Metadata (`metadata`) | Native administrator and frontend article edit; SmartBrowser administrator and frontend article edit |
 | `com_content.categories` | Category Description (`category-description`), Content Settings, Publishing, Metadata, Options (`category-options`) | Native administrator category edit; SmartBrowser category edit |
+| `com_tags.tag` | Tag Description (`tag-description`), Content Settings, Options (`tag-options`), Teaser Image (`tag-intro-image`), Full Image (`tag-full-image`), Publishing, Metadata | Native administrator tag edit; SmartBrowser tag edit |
 | `com_users.user` | Account Details (`user-account`), Basic Settings (`user-settings`) | Native administrator user edit, native frontend profile edit; SmartBrowser user edit |
 
 The native frontend article form combines status/settings with publication fields in its Publishing tab. Use **Publishing** there; it has no separate Content Settings region. Frontend profile Basic Settings appear only when Joomla enables frontend user parameters. Hidden/missing targets, unrelated forms and unrecognized layouts leave their groups in the original position. Joomla has no corresponding native frontend article-category editing form.
 
-Images/links, associations, permissions, registration and other component/category contexts are outside this release's scope.
+Article images/links, associations, permissions, registration and other component/category contexts are outside this release's scope. Tag image targets refer to their existing whole fieldsets, including image controls and captions; native tag Options refers to its layout/link-class fieldset.
+
+Tags require SmartTag's **System - SuperSoftJx - Tag Custom Fields** bridge and Joomla's **System - Fields** to define/render fields normally. SmartForms does not register the component's Fields service, add permissions or save tag field values. Its integration reads the already-rendered form metadata and retains Joomla/SmartTag ACL, language, state and Show On filtering. With no rendered groups, placement is inactive. Native frontend tag pages display tags; they are not tag edit forms and are untouched.
 
 ## Installation and use
 
-1. Install `build/output/plg_system_smartforms-v2.1.0.zip` and enable **System - SuperSoftJx - SmartForms**.
-2. Create/edit a Field Group in the article, article-category or user context.
+1. Install `build/output/plg_system_smartforms-v2.2.0.zip` and enable **System - SuperSoftJx - SmartForms**.
+2. Create/edit a Field Group in the article, article-category, user or tag context.
 3. Open **Form Placements** and select a target. The choices are restricted to that group's context.
 4. Select **Replace / Toggle**, **Before**, **After**, **Left** or **Right** and save.
 

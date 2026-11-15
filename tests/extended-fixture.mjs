@@ -3,6 +3,7 @@ export const catalogs = {
   article: ['article-text', 'content-settings', 'publishing', 'metadata'],
   category: ['category-description', 'content-settings', 'publishing', 'metadata', 'category-options'],
   user: ['user-account', 'user-settings'],
+  tag: ['tag-description', 'content-settings', 'tag-options', 'tag-intro-image', 'tag-full-image', 'publishing', 'metadata'],
 };
 export function extendedFixture(url) {
   const type = url.searchParams.get('type') || 'article';
@@ -10,14 +11,14 @@ export function extendedFixture(url) {
   const profile = adapter === 'native-profile';
   const frontend = adapter === 'native-article-site';
   const smart = adapter === 'smartbrowser';
-  const context = { article: 'com_content.article', category: 'com_content.categories', user: 'com_users.user' }[type];
+  const context = { article: 'com_content.article', category: 'com_content.categories', user: 'com_users.user', tag: 'com_tags.tag' }[type];
   const targets = catalogs[type];
   const labels = Object.fromEntries(targets.map(id => [id, id.replaceAll('-', ' ')]));
   const tab = (id, label, html, active = false) => `<joomla-tab-element id="${id}" name="${label}" ${active ? 'active' : ''}>${html}</joomla-tab-element>`;
   const input = (name, value = 'Native draft') => `<label for="jform_${name}">${name}</label><input id="jform_${name}" name="jform[${name}]" value="${value}" required="required">`;
   const text = name => `<label for="jform_${name}">${name}</label><textarea class="rich-editor" id="jform_${name}" name="jform[${name}]">Native editor draft</textarea>`;
   const panel = (id, html, attrs = '') => `<fieldset ${attrs} class="options-form"><legend>${labels[id]}</legend>${html}</fieldset>`;
-  const mainId = smart ? 'smartbrowser-main' : type === 'user' ? 'details' : frontend ? 'editor' : 'general';
+  const mainId = smart ? 'smartbrowser-main' : ['user','tag'].includes(type) ? 'details' : frontend ? 'editor' : 'general';
   let main, extra = '';
   if (type === 'user') {
     main = panel('user-account', `<div class="form-grid">${input('username')}${input('name')}${input('email')}</div>`);
@@ -29,12 +30,13 @@ export function extendedFixture(url) {
   } else {
     const editorName = type === 'article' ? 'articletext' : 'description';
     const editor = smart ? panel(targets[0], text(editorName)) : type === 'article'
-      ? `<div><fieldset class="adminform">${text(editorName)}</fieldset></div>` : text(editorName);
+      ? `<div><fieldset class="adminform">${text(editorName)}</fieldset></div>` : type === 'tag' ? `<div class="form-vertical">${text(editorName)}</div>` : text(editorName);
     const global = `<fieldset class="form-vertical"><legend class="visually-hidden">Global</legend>${input('state')}</fieldset>`;
     main = `<div class="row"><div class="col-lg-9">${editor}</div><div class="col-lg-3">${smart ? panel('content-settings', global) : global}</div></div>`;
     extra = tab(smart ? 'smartbrowser-publishing' : 'publishing', 'Publishing', `<div class="row"><div class="col-lg-6">${panel('publishing', input('publish_up'), smart ? '' : 'id="fieldset-publishingdata"')}</div><div class="col-lg-6">${panel('metadata', input('metadesc'), smart ? '' : 'id="fieldset-metadata"')}</div></div>`);
   }
   if(type==='category') extra += tab('attrib-options','Options', panel('category-options', '<div class="form-grid">'+input('params_category_layout')+'</div>', 'id="fieldset-basic"'));
+  if(type==='tag') extra = tab('attrib-basic','Options', panel('tag-options',input('params_tag_layout'),'id="fieldset-options"') + panel('tag-intro-image',input('images_image_intro'),'id="fieldset-image-intro"') + panel('tag-full-image',input('images_image_fulltext'),'id="fieldset-image-fulltext"')) + extra;
   const groups = targets.flatMap((target, index) => (url.searchParams.has('sides') ? ['toggle','before','toggle','after','left','right','left','right'] : url.searchParams.has('leftOnly') ? ['left','left'] : url.searchParams.has('rightOnly') ? ['right','right'] : ['toggle', 'before', 'toggle', 'after']).map((mode, offset) => ({
     fieldset: `fields-${100 + index * 10 + offset}`, target, mode,
     fieldIds: [`jform_com_fields_f${100 + index * 10 + offset}`],
